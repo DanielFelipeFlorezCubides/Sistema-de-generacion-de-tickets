@@ -8,8 +8,9 @@ function validate(schema, source = "body") {
       req[source] = parsedData; // Actualiza con los datos sanitizados/tipados por Zod
       next();
     } catch (error) {
-      if (error.errors && Array.isArray(error.errors)) {
-        const errorMessages = error.errors.map(err => `${err.path.join(".")}: ${err.message}`).join(", ");
+      const issues = error.issues || error.errors;
+      if (issues && Array.isArray(issues)) {
+        const errorMessages = issues.map(err => `${err.path.join(".")}: ${err.message}`).join(", ");
         return next(new AppError(`Error de validación: ${errorMessages}`, 400, "VALIDATION_ERROR"));
       }
       next(error);

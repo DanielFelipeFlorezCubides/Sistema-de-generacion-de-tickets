@@ -2,6 +2,8 @@ const express = require("express");
 const errorHandler = require("./middlewares/error.middleware");
 const NotFoundError = require("./exceptions/NotFoundError");
 
+const authRoutes = require("./routes/auth.routes");
+
 const app = express();
 
 app.use(express.json());
@@ -10,6 +12,9 @@ app.use(express.json());
 app.get("/api/health", (req, res) => {
   res.status(200).json({ status: "OK", timestamp: new Date().toISOString() });
 });
+
+// Rutas de la API
+app.use("/api/auth", authRoutes);
 
 // Manejo de ruta no encontrada (404)
 app.use((req, res, next) => {
