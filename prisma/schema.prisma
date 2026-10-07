@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Rol {
+  ADMIN
+  SOPORTE
+  USUARIO
+}
+
+enum Categoria {
+  HARDWARE
+  SOFTWARE
+  CONECTIVIDAD
+  ACCESOS
+  OTRO
+}
+
+enum Prioridad {
+  BAJA
+  MEDIA
+  ALTA
+  CRITICA
+}
+
+enum Estado {
+  ABIERTO
+  EN_PROCESO
+  RESUELTO
+  CERRADO
+}
+
+model Usuario {
+  id            Int      @id @default(autoincrement())
+  nombre        String
+  correo        String   @unique
+  password      String
+  rol           Rol      @default(USUARIO)
+  fechaCreacion DateTime @default(now())
+
+  // Relaciones
+  ticketsSolicitados Ticket[] @relation("TicketsSolicitados")
+  ticketsAsignados   Ticket[] @relation("TicketsAsignados")
+
+  @@map("usuarios")
+}
+
+model Ticket {
+  id                   Int       @id @default(autoincrement())
+  titulo               String
+  descripcion          String
+  categoria            Categoria
+  prioridad            Prioridad
+  estado               Estado    @default(ABIERTO)
+  usuarioSolicitanteId Int
+  tecnicoAsignadoId    Int?
+  resumenIA            String?
+  etiquetasIA          String[]  @default([])
+  eliminadoEn          DateTime?
+  fechaCreacion        DateTime  @default(now())
+  fechaActualizacion   DateTime  @updatedAt
+
+  // Relaciones
+  usuarioSolicitante Usuario  @relation("TicketsSolicitados", fields: [usuarioSolicitanteId], references: [id])
+  tecnicoAsignado    Usuario? @relation("TicketsAsignados", fields: [tecnicoAsignadoId], references: [id])
+
+  @@map("tickets")
+}
