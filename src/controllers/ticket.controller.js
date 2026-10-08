@@ -83,9 +83,24 @@ class TicketController {
       next(error);
     }
   }
+
+  async delete(req, res, next) {
+    try {
+      const { id } = req.params;
+      await ticketService.deleteTicket(id);
+
+      return res.status(200).json({
+        status: "success",
+        message: "Ticket eliminado exitosamente"
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = new TicketController();
+
 
 
 

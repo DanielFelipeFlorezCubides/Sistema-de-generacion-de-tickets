@@ -180,9 +180,27 @@ class TicketService {
 
     return this._formatTicketResponse(updatedTicket);
   }
+
+  async deleteTicket(id) {
+    const ticketId = Number(id);
+
+    // 1. Verificar la existencia del ticket y que no haya sido eliminado previamente
+    const ticket = await ticketRepository.findById(ticketId);
+    if (!ticket || ticket.eliminadoEn !== null) {
+      throw new NotFoundError(`No se encontró el ticket con id ${ticketId}`);
+    }
+
+    // 2. Realizar la eliminación lógica estableciendo eliminadoEn en PostgreSQL
+    await ticketRepository.softDelete(ticketId);
+
+    return {
+      message: "Ticket eliminado exitosamente"
+    };
+  }
 }
 
 module.exports = new TicketService();
+
 
 
 

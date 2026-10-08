@@ -96,7 +96,17 @@ class TicketRepository {
       }
     });
   }
+
+  async softDelete(id) {
+    return prisma.ticket.update({
+      where: { id: Number(id) },
+      data: {
+        eliminadoEn: new Date()
+      }
+    });
+  }
 }
 
 module.exports = new TicketRepository();
+
 

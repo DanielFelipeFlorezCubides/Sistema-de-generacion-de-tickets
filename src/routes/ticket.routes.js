@@ -54,7 +54,16 @@ router.patch(
   ticketController.updateStatus
 );
 
+// DELETE /api/tickets/:id - Eliminación lógica de un ticket (requiere autenticación JWT)
+router.delete(
+  "/:id",
+  authMiddleware,
+  validate(ticketIdParamSchema, "params"),
+  ticketController.delete
+);
+
 module.exports = router;
+
 
 
 
