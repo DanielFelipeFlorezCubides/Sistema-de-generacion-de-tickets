@@ -71,6 +71,32 @@ class TicketRepository {
   async count(where = {}) {
     return prisma.ticket.count({ where });
   }
+
+  async update(id, data) {
+    return prisma.ticket.update({
+      where: { id: Number(id) },
+      data,
+      include: {
+        usuarioSolicitante: {
+          select: {
+            id: true,
+            nombre: true,
+            correo: true,
+            rol: true
+          }
+        },
+        tecnicoAsignado: {
+          select: {
+            id: true,
+            nombre: true,
+            correo: true,
+            rol: true
+          }
+        }
+      }
+    });
+  }
 }
 
 module.exports = new TicketRepository();
+

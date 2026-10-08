@@ -92,15 +92,7 @@ class TicketService {
     };
   }
 
-  async getTicketById(id) {
-    const ticketId = Number(id);
-    const ticket = await ticketRepository.findById(ticketId);
-
-    // Si el ticket no existe o fue eliminado lógicamente (eliminadoEn !== null)
-    if (!ticket || ticket.eliminadoEn !== null) {
-      throw new NotFoundError(`No se encontró el ticket con id ${ticketId}`);
-    }
-
+  _formatTicketResponse(ticket) {
     return {
       id: ticket.id,
       titulo: ticket.titulo,
@@ -122,10 +114,57 @@ class TicketService {
             nombre: ticket.tecnicoAsignado.nombre
           }
         : null,
-      fechaCreacion: ticket.fechaCreacion
+      fechaCreacion: ticket.fechaCreacion,
+      fechaActualizacion: ticket.fechaActualizacion
     };
+  }
+
+  async getTicketById(id) {
+    const ticketId = Number(id);
+    const ticket = await ticketRepository.findById(ticketId);
+
+    // Si el ticket no existe o fue eliminado lógicamente (eliminadoEn !== null)
+    if (!ticket || ticket.eliminadoEn !== null) {
+      throw new NotFoundError(`No se encontró el ticket con id ${ticketId}`);
+    }
+
+    return this._formatTicketResponse(ticket);
+  }
+
+  async assignTechnician({ ticketId, tecnicoId }) {
+    const tId = Number(ticketId);
+    const techId = Number(tecnicoId);
+
+    // 1. Verificar la existencia del ticket y que no se encuentre eliminado lógicamente
+    const ticket = await ticketRepository.findById(tId);
+    if (!ticket || ticket.eliminadoEn !== null) {
+      throw new NotFoundError(`No se encontró el ticket con id ${tId}`);
+    }
+
+    // 2. Verificar la existencia del usuario técnico en la base de datos
+    const tecnico = await userRepository.findById(techId);
+    if (!tecnico) {
+      throw new NotFoundError(`No se encontró el técnico con id ${techId}`);
+    }
+
+    // 3. Validación de Rol: El usuario debe tener estrictamente el rol SOPORTE
+    if (tecnico.rol !== "SOPORTE") {
+      throw new AppError(
+        "Únicamente los usuarios con rol SOPORTE pueden ser asignados como técnicos",
+        400,
+        "BAD_REQUEST"
+      );
+    }
+
+    // 4. Actualizar el ticket en PostgreSQL mediante Prisma
+    const updatedTicket = await ticketRepository.update(tId, {
+      tecnicoAsignadoId: techId
+    });
+
+    return this._formatTicketResponse(updatedTicket);
   }
 }
 
 module.exports = new TicketService();
+
 

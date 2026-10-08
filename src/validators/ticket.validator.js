@@ -74,9 +74,20 @@ const ticketIdParamSchema = z.object({
   ).transform(Number)
 });
 
+const assignTechnicianSchema = z.object({
+  tecnicoId: z.preprocess(
+    (val) => (val === undefined || val === null ? "" : String(val).trim()),
+    z.string({ required_error: "El campo tecnicoId es obligatorio" })
+      .min(1, "El campo tecnicoId es obligatorio")
+      .regex(/^[1-9]\d*$/, "El campo tecnicoId debe ser un número entero positivo")
+  ).transform(Number)
+});
+
 module.exports = {
   createTicketSchema,
   getTicketsQuerySchema,
-  ticketIdParamSchema
+  ticketIdParamSchema,
+  assignTechnicianSchema
 };
+
 

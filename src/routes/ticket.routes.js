@@ -5,7 +5,8 @@ const validate = require("../middlewares/validation.middleware");
 const {
   createTicketSchema,
   getTicketsQuerySchema,
-  ticketIdParamSchema
+  ticketIdParamSchema,
+  assignTechnicianSchema
 } = require("../validators/ticket.validator");
 
 const router = express.Router();
@@ -34,5 +35,15 @@ router.post(
   ticketController.create
 );
 
+// PATCH /api/tickets/:id/asignar - Asignar técnico a un ticket (requiere autenticación JWT)
+router.patch(
+  "/:id/asignar",
+  authMiddleware,
+  validate(ticketIdParamSchema, "params"),
+  validate(assignTechnicianSchema, "body"),
+  ticketController.assignTechnician
+);
+
 module.exports = router;
+
 

@@ -51,7 +51,24 @@ class TicketController {
       next(error);
     }
   }
+
+  async assignTechnician(req, res, next) {
+    try {
+      const { id } = req.params;
+      const { tecnicoId } = req.body;
+
+      const updatedTicket = await ticketService.assignTechnician({
+        ticketId: id,
+        tecnicoId
+      });
+
+      return res.status(200).json(updatedTicket);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = new TicketController();
+
 
