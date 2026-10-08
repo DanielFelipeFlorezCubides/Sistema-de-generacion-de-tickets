@@ -33,6 +33,64 @@ class TicketService {
 
     return nuevoTicket;
   }
+
+  async getTickets(query = {}) {
+    const {
+      estado,
+      categoria,
+      prioridad,
+      usuarioSolicitante,
+      usuarioId,
+      page = 1,
+      limit = 10
+    } = query;
+
+    // 1. Regla de Eliminación Lógica (Soft Delete): Excluir registros con eliminadoEn != null
+    const where = {
+      eliminadoEn: null
+    };
+
+    // 2. Filtros mínimos obligatorios
+    if (estado) {
+      where.estado = estado;
+    }
+
+    if (categoria) {
+      where.categoria = categoria;
+    }
+
+    if (prioridad) {
+      where.prioridad = prioridad;
+    }
+
+    const solicitanteId = usuarioSolicitante || usuarioId;
+    if (solicitanteId) {
+      where.usuarioSolicitanteId = Number(solicitanteId);
+    }
+
+    // 3. Paginación básica
+    const pageNum = Math.max(1, Number(page) || 1);
+    const limitNum = Math.max(1, Number(limit) || 10);
+    const skip = (pageNum - 1) * limitNum;
+
+    const [tickets, total] = await Promise.all([
+      ticketRepository.findMany({
+        where,
+        skip,
+        take: limitNum,
+        orderBy: { fechaCreacion: "desc" }
+      }),
+      ticketRepository.count(where)
+    ]);
+
+    return {
+      tickets,
+      total,
+      page: pageNum,
+      limit: limitNum,
+      totalPages: Math.ceil(total / limitNum) || 1
+    };
+  }
 }
 
 module.exports = new TicketService();

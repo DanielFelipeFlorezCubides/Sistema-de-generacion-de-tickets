@@ -5,7 +5,16 @@ function validate(schema, source = "body") {
     try {
       const dataToValidate = req[source];
       const parsedData = schema.parse(dataToValidate);
-      req[source] = parsedData; // Actualiza con los datos sanitizados/tipados por Zod
+      if (source === "query") {
+        Object.defineProperty(req, "query", {
+          value: parsedData,
+          writable: true,
+          configurable: true,
+          enumerable: true
+        });
+      } else {
+        req[source] = parsedData; // Actualiza con los datos sanitizados/tipados por Zod
+      }
       next();
     } catch (error) {
       const issues = error.issues || error.errors;

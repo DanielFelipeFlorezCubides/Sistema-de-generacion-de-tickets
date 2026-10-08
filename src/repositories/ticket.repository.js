@@ -40,6 +40,37 @@ class TicketRepository {
       }
     });
   }
+
+  async findMany({ where = {}, skip, take, orderBy = { fechaCreacion: "desc" } } = {}) {
+    return prisma.ticket.findMany({
+      where,
+      skip,
+      take,
+      orderBy,
+      include: {
+        usuarioSolicitante: {
+          select: {
+            id: true,
+            nombre: true,
+            correo: true,
+            rol: true
+          }
+        },
+        tecnicoAsignado: {
+          select: {
+            id: true,
+            nombre: true,
+            correo: true,
+            rol: true
+          }
+        }
+      }
+    });
+  }
+
+  async count(where = {}) {
+    return prisma.ticket.count({ where });
+  }
 }
 
 module.exports = new TicketRepository();
