@@ -6,7 +6,8 @@ const {
   createTicketSchema,
   getTicketsQuerySchema,
   ticketIdParamSchema,
-  assignTechnicianSchema
+  assignTechnicianSchema,
+  updateTicketStatusSchema
 } = require("../validators/ticket.validator");
 
 const router = express.Router();
@@ -44,6 +45,16 @@ router.patch(
   ticketController.assignTechnician
 );
 
+// PATCH /api/tickets/:id/estado - Actualizar estado de un ticket (requiere autenticación JWT)
+router.patch(
+  "/:id/estado",
+  authMiddleware,
+  validate(ticketIdParamSchema, "params"),
+  validate(updateTicketStatusSchema, "body"),
+  ticketController.updateStatus
+);
+
 module.exports = router;
+
 
 

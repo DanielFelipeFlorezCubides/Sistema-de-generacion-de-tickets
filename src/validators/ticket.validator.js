@@ -83,11 +83,20 @@ const assignTechnicianSchema = z.object({
   ).transform(Number)
 });
 
+const updateTicketStatusSchema = z.object({
+  estado: z.enum(["ABIERTO", "EN_PROCESO", "RESUELTO", "CERRADO"], {
+    message: "El estado debe ser ABIERTO, EN_PROCESO, RESUELTO o CERRADO",
+    errorMap: () => ({ message: "El estado debe ser ABIERTO, EN_PROCESO, RESUELTO o CERRADO" })
+  })
+});
+
 module.exports = {
   createTicketSchema,
   getTicketsQuerySchema,
   ticketIdParamSchema,
-  assignTechnicianSchema
+  assignTechnicianSchema,
+  updateTicketStatusSchema
 };
+
 
 

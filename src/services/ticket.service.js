@@ -163,8 +163,26 @@ class TicketService {
 
     return this._formatTicketResponse(updatedTicket);
   }
+
+  async updateTicketStatus({ ticketId, estado }) {
+    const tId = Number(ticketId);
+
+    // 1. Verificar la existencia del ticket y que no se encuentre eliminado lógicamente
+    const ticket = await ticketRepository.findById(tId);
+    if (!ticket || ticket.eliminadoEn !== null) {
+      throw new NotFoundError(`No se encontró el ticket con id ${tId}`);
+    }
+
+    // 2. Actualizar el estado del ticket en PostgreSQL mediante Prisma
+    const updatedTicket = await ticketRepository.update(tId, {
+      estado
+    });
+
+    return this._formatTicketResponse(updatedTicket);
+  }
 }
 
 module.exports = new TicketService();
+
 
 
