@@ -67,7 +67,16 @@ const getTicketsQuerySchema = z.object({
     .default(10)
 });
 
+const ticketIdParamSchema = z.object({
+  id: z.preprocess(
+    (val) => (val === undefined || val === null ? "" : String(val).trim()),
+    z.string().regex(/^[1-9]\d*$/, "El ID del ticket debe ser un número entero positivo")
+  ).transform(Number)
+});
+
 module.exports = {
   createTicketSchema,
-  getTicketsQuerySchema
+  getTicketsQuerySchema,
+  ticketIdParamSchema
 };
+

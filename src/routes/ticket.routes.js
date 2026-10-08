@@ -2,7 +2,11 @@ const express = require("express");
 const ticketController = require("../controllers/ticket.controller");
 const authMiddleware = require("../middlewares/auth.middleware");
 const validate = require("../middlewares/validation.middleware");
-const { createTicketSchema, getTicketsQuerySchema } = require("../validators/ticket.validator");
+const {
+  createTicketSchema,
+  getTicketsQuerySchema,
+  ticketIdParamSchema
+} = require("../validators/ticket.validator");
 
 const router = express.Router();
 
@@ -14,6 +18,14 @@ router.get(
   ticketController.getAll
 );
 
+// GET /api/tickets/:id - Consultar detalle de un ticket por ID (requiere autenticación JWT)
+router.get(
+  "/:id",
+  authMiddleware,
+  validate(ticketIdParamSchema, "params"),
+  ticketController.getById
+);
+
 // POST /api/tickets - Crear nuevo ticket de soporte (requiere autenticación JWT)
 router.post(
   "/",
@@ -23,3 +35,4 @@ router.post(
 );
 
 module.exports = router;
+

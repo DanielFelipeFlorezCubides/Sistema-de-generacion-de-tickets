@@ -40,6 +40,18 @@ class TicketController {
       next(error);
     }
   }
+
+  async getById(req, res, next) {
+    try {
+      const { id } = req.params;
+      const ticket = await ticketService.getTicketById(id);
+
+      return res.status(200).json(ticket);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = new TicketController();
+

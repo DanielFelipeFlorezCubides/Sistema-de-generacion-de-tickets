@@ -91,6 +91,41 @@ class TicketService {
       totalPages: Math.ceil(total / limitNum) || 1
     };
   }
+
+  async getTicketById(id) {
+    const ticketId = Number(id);
+    const ticket = await ticketRepository.findById(ticketId);
+
+    // Si el ticket no existe o fue eliminado lógicamente (eliminadoEn !== null)
+    if (!ticket || ticket.eliminadoEn !== null) {
+      throw new NotFoundError(`No se encontró el ticket con id ${ticketId}`);
+    }
+
+    return {
+      id: ticket.id,
+      titulo: ticket.titulo,
+      descripcion: ticket.descripcion,
+      categoria: ticket.categoria,
+      prioridad: ticket.prioridad,
+      estado: ticket.estado,
+      resumenIA: ticket.resumenIA,
+      etiquetasIA: ticket.etiquetasIA,
+      solicitante: ticket.usuarioSolicitante
+        ? {
+            id: ticket.usuarioSolicitante.id,
+            nombre: ticket.usuarioSolicitante.nombre
+          }
+        : null,
+      tecnicoAsignado: ticket.tecnicoAsignado
+        ? {
+            id: ticket.tecnicoAsignado.id,
+            nombre: ticket.tecnicoAsignado.nombre
+          }
+        : null,
+      fechaCreacion: ticket.fechaCreacion
+    };
+  }
 }
 
 module.exports = new TicketService();
+
