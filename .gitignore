@@ -1,7 +1,27 @@
+# Dependencias
+node_modules/
+
+# Variables de entorno y secretos sensibles
+.env
+.env.local
+.env.*.local
+
+# Asistentes de IA y configuración de editor
 .agents
 .claude
 .cursor
 .devin
-Context
-node_modules
-.env
+.vscode/
+.idea/
+
+# Material y guías del evaluador
+Context/
+
+# Logs y reportes de cobertura
+*.log
+npm-debug.log*
+coverage/
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
